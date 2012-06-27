@@ -2,8 +2,11 @@ package db;
 
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
+import java.util.HashSet;
+import java.util.Set;
 
 import db.util.PreparedStatementExecutionItem;
+import models.Item;
 
 public class StcaDb extends DbConnection
 {
@@ -17,7 +20,9 @@ public class StcaDb extends DbConnection
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * Creates a db on the current connection.
+	 * @param dbName
+	 * @return true for success
 	 */
 	public boolean createDb(String dbName) {
 		PreparedStatement s;
@@ -46,5 +51,11 @@ public class StcaDb extends DbConnection
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	public Set<Item> getItems(int iLIMIT, int iOFFSET)
+	{
+		Set<Item> items = new HashSet<Item>();
+		return items;
 	}
 }
