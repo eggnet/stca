@@ -5,9 +5,9 @@ import java.sql.PreparedStatement;
 
 import db.util.PreparedStatementExecutionItem;
 
-public class SotecDb extends DbConnection
+public class StcaDb extends DbConnection
 {
-	public SotecDb(){
+	public StcaDb(){
 		super();
 	}
 	
@@ -15,15 +15,13 @@ public class SotecDb extends DbConnection
 	{
 		return super.connect(dbName);
 	}
+	
 	/**
-	 * Creates a db on the current connection.
-	 * @param dbName
-	 * @return true for success
+	 * {@inheritDoc}
 	 */
 	public boolean createDb(String dbName) {
 		PreparedStatement s;
 		try {
-			
 			// Drop the DB if it already exists
 			String query = "DROP DATABASE IF EXISTS " + dbName + ";";
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(query, null);
@@ -49,6 +47,4 @@ public class SotecDb extends DbConnection
 			return false;
 		}
 	}
-	
-
 }
