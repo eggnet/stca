@@ -2,12 +2,15 @@ package db;
 
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
+import java.util.HashSet;
+import java.util.Set;
 
 import db.util.PreparedStatementExecutionItem;
+import models.Item;
 
-public class SotecDb extends DbConnection
+public class StcaDb extends SocialDb
 {
-	public SotecDb(){
+	public StcaDb(){
 		super();
 	}
 	
@@ -15,6 +18,7 @@ public class SotecDb extends DbConnection
 	{
 		return super.connect(dbName);
 	}
+	
 	/**
 	 * Creates a db on the current connection.
 	 * @param dbName
@@ -23,7 +27,6 @@ public class SotecDb extends DbConnection
 	public boolean createDb(String dbName) {
 		PreparedStatement s;
 		try {
-			
 			// Drop the DB if it already exists
 			String query = "DROP DATABASE IF EXISTS " + dbName + ";";
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(query, null);
@@ -50,5 +53,9 @@ public class SotecDb extends DbConnection
 		}
 	}
 	
-
+	public Set<Item> getItems(int iLIMIT, int iOFFSET)
+	{
+		Set<Item> items = new HashSet<Item>();
+		return items;
+	}
 }

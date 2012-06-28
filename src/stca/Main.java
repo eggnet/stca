@@ -1,11 +1,11 @@
-package sotec;
+package stca;
 
 import java.util.MissingFormatArgumentException;
 
 public class Main {
 	public static void main(String[] args)	
 	{
-		System.out.println("SotectAnalyzer tool developed by eggnet at UVic.");
+		System.out.println("Social Technical Network Analyzer tool developed by eggnet at UVic.");
 		try {
 			if (args.length < 1)
 			{
@@ -15,7 +15,7 @@ public class Main {
 			{
 				try 
 				{
-					// Todo
+					
 				} 
 				catch (MissingFormatArgumentException e) 
 				{
