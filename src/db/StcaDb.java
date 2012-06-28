@@ -8,7 +8,7 @@ import java.util.Set;
 import db.util.PreparedStatementExecutionItem;
 import models.Item;
 
-public class StcaDb extends DbConnection
+public class StcaDb extends SocialDb
 {
 	public StcaDb(){
 		super();

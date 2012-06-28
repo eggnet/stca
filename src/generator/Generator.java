@@ -34,6 +34,9 @@ public class Generator
 			commits = db.getCommits(Resources.DB_LIMIT, pagingOffset);
 			for (Commit currentCommit : commits)
 			{
+				// Get all the items in this commit
+				Set<Item> itemsForCommit = stcaDb.getAllLinkedItemsForCommit(currentCommit.getCommit_id());
+				
 				
 			}
 		}
