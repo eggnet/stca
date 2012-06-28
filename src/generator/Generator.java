@@ -1,8 +1,10 @@
 package generator;
 
 import java.util.List;
+import java.util.Set;
 
 import models.Commit;
+import models.Item;
 
 import db.DbConnection;
 import db.Resources;
