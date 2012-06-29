@@ -36,7 +36,10 @@ public class Generator
 			{
 				// Get all the related items and their threads.
 				Network commitNetwork = stcaDb.getNetwork(currentCommit.getCommit_id());
+				commitNetwork.buildCommitPatterns();
 				
+				// get pass/fail from technical db
+				commitNetwork.setPass(db.getCommitStatus(currentCommit.getCommit_id()));
 			}
 		}
 	}
