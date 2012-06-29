@@ -1,8 +1,14 @@
 package generator;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import models.Commit;
+import models.Item;
+import models.Person;
 
 import db.DbConnection;
 import db.Resources;
@@ -34,9 +40,8 @@ public class Generator
 			commits = db.getCommits(Resources.DB_LIMIT, pagingOffset);
 			for (Commit currentCommit : commits)
 			{
-				// Get all the items in this commit
-				Set<Item> itemsForCommit = stcaDb.getAllLinkedItemsForCommit(currentCommit.getCommit_id());
-				
+				// Get all the related items and their threads.
+				Network commitNetwork = stcaDb.getNetwork(currentCommit.getCommit_id());
 				
 			}
 		}

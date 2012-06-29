@@ -52,10 +52,4 @@ public class StcaDb extends SocialDb
 			return false;
 		}
 	}
-	
-	public Set<Item> getItems(int iLIMIT, int iOFFSET)
-	{
-		Set<Item> items = new HashSet<Item>();
-		return items;
-	}
 }
