@@ -1,15 +1,9 @@
 package generator;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import models.Commit;
-import models.Item;
-import models.Person;
-
+import models.Network;
 import db.DbConnection;
 import db.Resources;
 import db.StcaDb;
