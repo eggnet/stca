@@ -20,11 +20,9 @@ CREATE SEQUENCE patterns_id_seq
 	
 CREATE TABLE patterns ( 
 	pattern_id integer NOT NULL PRIMARY KEY DEFAULT NEXTVAL('patterns_id_seq'::regclass),
-	person1 varchar(255),
-	person2 varchar(255),
+	p_id1 varchar(255),
+	p_id2 varchar(255),
 	type varchar(255),
-	exist integer,
-	not_exist integer,
 	passed varchar(10)
 );
 

@@ -52,6 +52,9 @@ public class STPattern {
 	public void setTechnicalFuzzyWeight(float technicalFuzzyWeight) {
 		this.technicalFuzzyWeight = technicalFuzzyWeight;
 	}
+	
+	public STPattern()
+	{ }
 
 	public String getPerson1Id() {
 		return person1Id;

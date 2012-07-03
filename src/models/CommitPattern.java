@@ -14,6 +14,8 @@ public class CommitPattern {
 		this.isFailure = isFailure;
 	}
 
+	public CommitPattern() { }
+
 	public String getCommitId() {
 		return commitId;
 	}

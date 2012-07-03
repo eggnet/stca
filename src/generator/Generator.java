@@ -17,10 +17,12 @@ import db.StcaDb;
 public class Generator
 {
 	public StcaDb stcaDb;
-	
 	public DbConnection db;
 	
-	public Generator() { }
+	public Generator(StcaDb stcaDb, DbConnection db) {
+		this.stcaDb = stcaDb;
+		this.db = db;
+	}
 	
 	/**
 	 * Iterates over all the {@link models.Commit} in a repo, and builds up a list of 
@@ -40,6 +42,9 @@ public class Generator
 				
 				// get pass/fail from technical db
 				commitNetwork.setPass(db.getCommitStatus(currentCommit.getCommit_id()));
+				
+				// Insert into graph tables.
+				// TODO @braden
 			}
 		}
 	}
