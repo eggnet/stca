@@ -7,21 +7,24 @@ public class STPattern {
 	private weightLevels weightLevel;
 	private float socialWeight;
 	private float technicalWeight;
+	private float technicalFuzzyWeight;
 	
 	public enum weightLevels{
 		LOW,
 		MEDIUM,
 		HIGH,
+		UNKNOWN
 	}
 	public enum patternTypes{
 		SOCIAL_ONLY,
 		TECHNICAL_ONLY,
 		SOCIAL_TECHNICAL,
+		UNKNOWN,
 	}
 	
 	public STPattern(String person1Id, String person2Id,
 			patternTypes patternType, weightLevels weightLevel,
-			float socialWeight, float technicalWeight) {
+			float socialWeight, float technicalWeight, float technicalFuzzyWeight) {
 		super();
 		this.person1Id = person1Id;
 		this.person2Id = person2Id;
@@ -29,8 +32,27 @@ public class STPattern {
 		this.weightLevel = weightLevel;
 		this.socialWeight = socialWeight;
 		this.technicalWeight = technicalWeight;
+		this.technicalFuzzyWeight = technicalFuzzyWeight;
 	}
 	
+	public void addWeight(float weight)
+	{
+		this.technicalWeight += weight;
+	}
+	
+	public void addFuzzyWeight(float weight)
+	{
+		this.technicalFuzzyWeight += weight;
+	}
+	
+	public float getTechnicalFuzzyWeight() {
+		return technicalFuzzyWeight;
+	}
+
+	public void setTechnicalFuzzyWeight(float technicalFuzzyWeight) {
+		this.technicalFuzzyWeight = technicalFuzzyWeight;
+	}
+
 	public String getPerson1Id() {
 		return person1Id;
 	}
