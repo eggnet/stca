@@ -1,16 +1,16 @@
 package models;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CommitPattern {
 	private String newCommitId;
 	private String oldCommitId;
-	private Map<String, List<STPattern>> stPatterns;
+	private Map<String, Set<STPattern>> stPatterns;
 	private boolean isFailure;
 	
 	public CommitPattern(String newCommitId, String oldCommitId,
-			Map<String, List<STPattern>> stPatterns, boolean isFailure) {
+			Map<String, Set<STPattern>> stPatterns, boolean isFailure) {
 		super();
 		this.newCommitId = newCommitId;
 		this.oldCommitId = oldCommitId;
@@ -34,11 +34,11 @@ public class CommitPattern {
 		this.oldCommitId = oldCommitId;
 	}
 
-	public Map<String, List<STPattern>> getStPatterns() {
+	public Map<String, Set<STPattern>> getStPatterns() {
 		return stPatterns;
 	}
 
-	public void setStPatterns(Map<String, List<STPattern>> stPatterns) {
+	public void setStPatterns(Map<String, Set<STPattern>> stPatterns) {
 		this.stPatterns = stPatterns;
 	}
 
