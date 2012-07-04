@@ -2,12 +2,15 @@ package generator;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 import models.Commit;
+import models.CommitPattern;
 import models.Network;
 import models.Person;
 import models.STPattern;
 import models.STPattern.patternTypes;
+import models.UnorderedPair;
 import db.DbConnection;
 import db.Resources;
 import db.SocialAnalyzerDb;
@@ -40,6 +43,7 @@ public class Generator
 		while (pagingOffset != -1)
 		{
 			commits = techDb.getCommits(Resources.DB_LIMIT, pagingOffset);
+			if (commits.size() < Resources.DB_LIMIT) pagingOffset = -1;
 			for (Commit currentCommit : commits)
 			{
 				// Get all the related items and their threads.
@@ -52,12 +56,15 @@ public class Generator
 				// Insert into graph tables.
 				stcaDb.insertNetwork(commitNetwork);
 			}
+			pagingOffset += Resources.DB_LIMIT;
 		}
 	}
 	
 	public void buildCommitPatterns(Network network)
 	{
 		STPattern newSTPattern = null;
+		CommitPattern technicalCommitPattern = techDb.getTechnicalNetworkForCommit(network.getCommitId());
+
 		for (Integer threadId : network.getThreadPersonMap().keySet())
 		{						
 			// for each thread, construct links between the people involved.
@@ -75,9 +82,25 @@ public class Generator
 					newSTPattern.setPerson1Id(currentPerson.getEmail());
 					newSTPattern.setPerson2Id(p.getEmail());
 				}
-				network.getSocialNetworkCommitPattern().getStPatterns().put(newSTPattern.getPerson1Id() + newSTPattern.getPerson2Id(), newSTPattern);
+				
+				// Construct the key 
+				UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
+				
+				// combine our pattern into the technical one.
+				if (technicalCommitPattern.getStPatterns().containsKey(pair))
+				{
+					// its in our technical pattern already, combine the patterns
+					STPattern techPattern = technicalCommitPattern.getStPatterns().get(pair);
+					techPattern.setPatternType(patternTypes.SOCIAL_TECHNICAL);
+					technicalCommitPattern.getStPatterns().put(pair, techPattern);
+				}
+				else
+				{
+					//add a new pattern in
+					technicalCommitPattern.getStPatterns().put(pair, newSTPattern);
+				}
 			}
 		}
-		network.setTechnicalNetworkCommitPattern(techDb.getTechnicalNetworkForCommit(network.getCommitId()));
+		network.setNetworkCommitPattern(technicalCommitPattern);
 	}
 }

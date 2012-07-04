@@ -4,10 +4,10 @@ import java.util.Map;
 
 public class CommitPattern {
 	private String commitId;
-	private Map<String,STPattern> stPatterns;
+	private Map<UnorderedPair<String, String>, STPattern> stPatterns;
 	private boolean isFailure;
 	
-	public CommitPattern(String commitId, Map<String, STPattern> stPatterns, boolean isFailure) {
+	public CommitPattern(String commitId, Map<UnorderedPair<String, String>, STPattern> stPatterns, boolean isFailure) {
 		super();
 		this.commitId = commitId;
 		this.stPatterns = stPatterns;
@@ -24,11 +24,11 @@ public class CommitPattern {
 		this.commitId = commitId;
 	}
 
-	public Map<String, STPattern> getStPatterns() {
+	public Map<UnorderedPair<String, String>, STPattern> getStPatterns() {
 		return stPatterns;
 	}
 
-	public void setStPatterns(Map<String, STPattern> stPatterns) {
+	public void setStPatterns(Map<UnorderedPair<String, String>, STPattern> stPatterns) {
 		this.stPatterns = stPatterns;
 	}
 

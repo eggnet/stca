@@ -1,11 +1,7 @@
 package models;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import models.STPattern.patternTypes;
 
 /**
  * Holds all the information of the social network based on information from the <a href="https://github.com/eggnet/com2pgsql">com2pgsql</a> project.
@@ -17,19 +13,16 @@ public class Network
 	private Map<Integer, Set<Item>> threadItemMap;
 	private Map<Integer, Set<Person>> threadPersonMap;
 	private boolean isPass;
-	private CommitPattern socialNetworkCommitPattern;
-	private CommitPattern technicalNetworkCommitPattern;
+	private CommitPattern networkCommitPattern;
 	private String commitId;
 	
 	public Network() {
-		this.socialNetworkCommitPattern = new CommitPattern();
-		this.technicalNetworkCommitPattern = new CommitPattern();
+		this.networkCommitPattern = new CommitPattern();
 	}
 
 	/**
 	 * Only can be called after setting {@link #threadItemMap} and {@link #threadPersonMap}
 	 */
-	
 	public Map<Integer, Set<Item>> getThreadItemMap()
 	{
 		return threadItemMap;
@@ -60,24 +53,14 @@ public class Network
 		this.isPass = isPass;
 	}
 
-	public CommitPattern getSocialNetworkCommitPattern()
+	public CommitPattern getNetworkCommitPattern()
 	{
-		return socialNetworkCommitPattern;
+		return networkCommitPattern;
 	}
 
-	public void setSocialNetworkCommitPattern(CommitPattern networkCommitPattern)
+	public void setNetworkCommitPattern(CommitPattern networkCommitPattern)
 	{
-		this.socialNetworkCommitPattern = networkCommitPattern;
-	}
-
-	public CommitPattern getTechnicalNetworkCommitPattern()
-	{
-		return technicalNetworkCommitPattern;
-	}
-
-	public void setTechnicalNetworkCommitPattern(CommitPattern technicalNetworkCommitPattern)
-	{
-		this.technicalNetworkCommitPattern = technicalNetworkCommitPattern;
+		this.networkCommitPattern = networkCommitPattern;
 	}
 
 	public String getCommitId()

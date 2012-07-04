@@ -9,6 +9,7 @@ import models.CommitPattern;
 import models.STPattern;
 import models.STPattern.patternTypes;
 import models.STPattern.weightLevels;
+import models.UnorderedPair;
 import db.util.ISetter;
 import db.util.PreparedStatementExecutionItem;
 import db.util.ISetter.StringSetter;
@@ -27,7 +28,7 @@ public class TechnicalAnalyzerDb extends TechnicalDb
 	public CommitPattern getTechnicalNetworkForCommit(String commitId)
 	{
 		try{
-			Map<String, STPattern> stPatterns = new HashMap<String, STPattern>();
+			Map<UnorderedPair<String, String>, STPattern> stPatterns = new HashMap<UnorderedPair<String, String>, STPattern>();
 			String sql = "SELECT source, target, weight, is_fuzzy FROM " +
 					"networks natural join edges WHERE " +
 					"new_commit_id=?";
@@ -46,8 +47,7 @@ public class TechnicalAnalyzerDb extends TechnicalDb
 				float weight 		= rs.getFloat("weight");
 				
 				// add all the network found from the edges.
-				// Key are email1+email2
-				String patternKey 		 = person1 + person2;
+				UnorderedPair<String, String> patternKey = new UnorderedPair<String, String>(person1, person2);
 				String patternKeyReverse = person2 + person1;
 				if(stPatterns.containsKey(patternKey))
 				{

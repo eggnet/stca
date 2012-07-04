@@ -22,8 +22,10 @@ public class Main {
 			{
 				try 
 				{
-					//TODO @braden
+					socialDb.connect(args[0]);
+					techDb.connect(args[1]);
 					Generator gen = new Generator(socialDb, techDb);
+					gen.generate();
 				} 
 				catch (MissingFormatArgumentException e) 
 				{
