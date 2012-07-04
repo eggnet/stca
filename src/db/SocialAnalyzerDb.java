@@ -5,24 +5,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
-
 import java.util.Map;
 import java.util.Set;
 
-import db.util.ISetter;
-import db.util.PreparedStatementExecutionItem;
-import db.util.ISetter.StringSetter;
-import models.CommitPattern;
 import models.Item;
-import models.STPattern;
-import models.STPattern.patternTypes;
-import models.STPattern.weightLevels;
 import models.Network;
 import models.Person;
+import models.STPattern;
+import db.util.ISetter;
+import db.util.ISetter.BooleanSetter;
+import db.util.ISetter.IntSetter;
+import db.util.ISetter.StringSetter;
+import db.util.PreparedStatementExecutionItem;
 
-public class StcaDb extends SocialDb
+public class SocialAnalyzerDb extends SocialDb
 {
-	public StcaDb(){
+	public SocialAnalyzerDb(){
 		super();
 	}
 	
@@ -194,6 +192,7 @@ public class StcaDb extends SocialDb
 			}
 			network.setThreadItemMap(threadItemMap);
 			network.setThreadPersonMap(threadPersonMap);
+			network.setCommitId(commitId);
 			return network;
 		}
 		catch (SQLException e)
@@ -250,66 +249,75 @@ public class StcaDb extends SocialDb
 		}
 	}
 	
-	public CommitPattern getTechnicalNetworkForCommit(String commitId)
+	public boolean insertSTPattern(STPattern pattern, boolean isPassingCommit)
 	{
-		try{
-			Map<String, STPattern> stPatterns = new HashMap<String, STPattern>();
-			String sql = "SELECT source, target, weight, is_fuzzy FROM " +
-					"networks natural join edges WHERE " +
-					"new_commit_id=?";
-			
-			ISetter[] params = {new StringSetter(1, commitId)};
-			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, params);
+		try
+		{
+			String sql = "SELECT * from patterns where p_id1=? and p_id2=?";
+			ISetter[] parms = {
+					new StringSetter(1, pattern.getPerson1Id()), 
+					new StringSetter(2, pattern.getPerson2Id()), 
+			};
+			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, parms);
 			this.addExecutionItem(ei);
 			ei.waitUntilExecuted();
-			
 			ResultSet rs = ei.getResult();
-			while(rs.next())
+			
+			if (rs.next())
 			{
-				String person1 	    = rs.getString("source");
-				String person2      = rs.getString("target");
-				String isFuzzy		= rs.getString("is_fuzzy");
-				float weight 		= rs.getFloat("weight");
-				
-				// add all the network found from the edges.
-				// Key are email1+email2
-				String patternKey 		 = person1 + person2;
-				String patternKeyReverse = person2 + person1;
-				if(stPatterns.containsKey(patternKey))
-				{
-					if(isFuzzy.equalsIgnoreCase("f"))
-						stPatterns.get(patternKey).addWeight(weight);
-					else
-						 stPatterns.get(patternKey).addFuzzyWeight(weight);
-				}
+				int countPassed = rs.getInt("passed");
+				int countFailed = rs.getInt("failed");
+				if (isPassingCommit)
+					countPassed++;
 				else
-				if(stPatterns.containsKey(patternKeyReverse))
-				{
-					if(isFuzzy.equalsIgnoreCase("f"))
-						stPatterns.get(patternKeyReverse).addWeight(weight);
-					else
-						 stPatterns.get(patternKeyReverse).addFuzzyWeight(weight);					
-				}
-				else 
-				{
-					// add new pattern
-					STPattern pattern = new STPattern(person1, person2, patternTypes.TECHNICAL_ONLY, weightLevels.UNKNOWN, 0, 0, 0);
-					if(isFuzzy.equalsIgnoreCase("f"))
-						pattern.addWeight(weight);
-					else
-						pattern.addFuzzyWeight(weight);		
-					
-					stPatterns.put(patternKey, pattern);
-				}
+					countFailed++;
+				sql = "UPDATE patterns SET passed=? and failed=? where p_id1=? and p_id2=?";
+				ISetter[] innerParms = {
+						new StringSetter(1, pattern.getPerson1Id()), 
+						new StringSetter(2, pattern.getPerson2Id()), 
+						new IntSetter(3, countPassed), 
+						new IntSetter(4, countFailed)
+				};
+				ei = new PreparedStatementExecutionItem(sql, innerParms);
+				this.addExecutionItem(ei);
 			}
-
-			CommitPattern comPatt = new CommitPattern(commitId, stPatterns, false);
-			return comPatt;	
+			else
+			{
+				sql = "INSERT INTO patterns VALUES (default, ?, ?, ?, ?, ?)";
+				ISetter[] innerParms = {
+						new StringSetter(1, pattern.getPerson1Id()), 
+						new StringSetter(2, pattern.getPerson2Id()), 
+						new StringSetter(3, pattern.getCommitId()), 
+						new StringSetter(4, pattern.getPatternType().toString()),
+						new BooleanSetter(5, isPassingCommit)
+				};
+				ei = new PreparedStatementExecutionItem(sql, innerParms);
+				this.addExecutionItem(ei);
+			}
+			return true;
 		}
 		catch (SQLException e)
 		{
 			e.printStackTrace();
-			return null;
+			return false;
 		}
+	}
+	
+	public boolean insertNetwork(Network network)
+	{	
+		// TODO @braden
+		// Go through all patterns in the social
+		// 		check if the current pattern is in technical pattern
+		//		if so, 
+		//			insert with both network type
+		//		else 
+		//			insert into social
+		// Then iterate over technical - social
+		// 		insert into technical only.
+		for (STPattern patt : network.getSocialNetworkCommitPattern().getStPatterns().values())
+		{
+			insertSTPattern(patt, network.isPass());
+		}
+		return true;
 	}
 }

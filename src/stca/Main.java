@@ -4,11 +4,12 @@ import generator.Generator;
 
 import java.util.MissingFormatArgumentException;
 
-import db.DbConnection;
-import db.StcaDb;
+import db.SocialAnalyzerDb;
+import db.TechnicalAnalyzerDb;
 
 public class Main {
-	public static StcaDb socialDb = new StcaDb();
+	public static SocialAnalyzerDb socialDb = new SocialAnalyzerDb();
+	public static TechnicalAnalyzerDb techDb = new TechnicalAnalyzerDb();
 	public static void main(String[] args)	
 	{
 		System.out.println("Social Technical Network Analyzer tool developed by eggnet at UVic.");
@@ -22,7 +23,7 @@ public class Main {
 				try 
 				{
 					//TODO @braden
-					Generator gen = new Generator(socialDb, null);
+					Generator gen = new Generator(socialDb, techDb);
 				} 
 				catch (MissingFormatArgumentException e) 
 				{

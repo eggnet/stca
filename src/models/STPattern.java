@@ -8,6 +8,7 @@ public class STPattern {
 	private float socialWeight;
 	private float technicalWeight;
 	private float technicalFuzzyWeight;
+	private String commitId;
 	
 	public enum weightLevels{
 		LOW,
@@ -91,6 +92,16 @@ public class STPattern {
 	}
 	public void setTechnicalWeight(float technicalWeight) {
 		this.technicalWeight = technicalWeight;
+	}
+
+	public String getCommitId()
+	{
+		return commitId;
+	}
+
+	public void setCommitId(String commitId)
+	{
+		this.commitId = commitId;
 	}
 		
 }

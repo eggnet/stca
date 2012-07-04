@@ -17,38 +17,18 @@ public class Network
 	private Map<Integer, Set<Item>> threadItemMap;
 	private Map<Integer, Set<Person>> threadPersonMap;
 	private boolean isPass;
-	private CommitPattern networkCommitPattern;
+	private CommitPattern socialNetworkCommitPattern;
+	private CommitPattern technicalNetworkCommitPattern;
+	private String commitId;
 	
 	public Network() {
-		this.networkCommitPattern = new CommitPattern();
+		this.socialNetworkCommitPattern = new CommitPattern();
+		this.technicalNetworkCommitPattern = new CommitPattern();
 	}
 
 	/**
 	 * Only can be called after setting {@link #threadItemMap} and {@link #threadPersonMap}
 	 */
-	public void buildCommitPatterns() {
-		STPattern newSTPattern = null;
-		for (Integer threadId : threadPersonMap.keySet())
-		{						
-			// for each thread, construct links between the people involved.
-			List<Person> personList = new LinkedList<Person>(threadPersonMap.get(threadId));
-			
-			for (int currentPersonPos = 0;currentPersonPos < personList.size() - 1;currentPersonPos++)
-			{
-				// create the connected set.
-				Person currentPerson = personList.get(currentPersonPos);
-				personList.remove(currentPersonPos);
-				for (Person p : personList)
-				{
-					newSTPattern = new STPattern();
-					newSTPattern.setPatternType(patternTypes.SOCIAL_ONLY);
-					newSTPattern.setPerson1Id(currentPerson.getEmail());
-					newSTPattern.setPerson2Id(p.getEmail());
-				}
-				this.networkCommitPattern.getStPatterns().put(newSTPattern.getPerson1Id() + newSTPattern.getPerson2Id(), newSTPattern);
-			}
-		}
-	}
 	
 	public Map<Integer, Set<Item>> getThreadItemMap()
 	{
@@ -80,13 +60,33 @@ public class Network
 		this.isPass = isPass;
 	}
 
-	public CommitPattern getNetworkCommitPattern()
+	public CommitPattern getSocialNetworkCommitPattern()
 	{
-		return networkCommitPattern;
+		return socialNetworkCommitPattern;
 	}
 
-	public void setNetworkCommitPattern(CommitPattern networkCommitPattern)
+	public void setSocialNetworkCommitPattern(CommitPattern networkCommitPattern)
 	{
-		this.networkCommitPattern = networkCommitPattern;
+		this.socialNetworkCommitPattern = networkCommitPattern;
+	}
+
+	public CommitPattern getTechnicalNetworkCommitPattern()
+	{
+		return technicalNetworkCommitPattern;
+	}
+
+	public void setTechnicalNetworkCommitPattern(CommitPattern technicalNetworkCommitPattern)
+	{
+		this.technicalNetworkCommitPattern = technicalNetworkCommitPattern;
+	}
+
+	public String getCommitId()
+	{
+		return commitId;
+	}
+
+	public void setCommitId(String commitId)
+	{
+		this.commitId = commitId;
 	}
 }

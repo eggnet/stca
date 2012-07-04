@@ -1,12 +1,18 @@
 package generator;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import models.Commit;
 import models.Network;
+import models.Person;
+import models.STPattern;
+import models.STPattern.patternTypes;
 import db.DbConnection;
 import db.Resources;
-import db.StcaDb;
+import db.SocialAnalyzerDb;
+import db.TechnicalAnalyzerDb;
+import db.TechnicalDb;
 
 /**
  * <code>Generator</code will go through each commit
@@ -16,12 +22,12 @@ import db.StcaDb;
  */
 public class Generator
 {
-	public StcaDb stcaDb;
-	public DbConnection db;
+	public SocialAnalyzerDb stcaDb;
+	public TechnicalAnalyzerDb techDb;
 	
-	public Generator(StcaDb stcaDb, DbConnection db) {
+	public Generator(SocialAnalyzerDb stcaDb, TechnicalAnalyzerDb db) {
 		this.stcaDb = stcaDb;
-		this.db = db;
+		this.techDb = db;
 	}
 	
 	/**
@@ -33,19 +39,45 @@ public class Generator
 		List<Commit> commits;
 		while (pagingOffset != -1)
 		{
-			commits = db.getCommits(Resources.DB_LIMIT, pagingOffset);
+			commits = techDb.getCommits(Resources.DB_LIMIT, pagingOffset);
 			for (Commit currentCommit : commits)
 			{
 				// Get all the related items and their threads.
 				Network commitNetwork = stcaDb.getNetwork(currentCommit.getCommit_id());
-				commitNetwork.buildCommitPatterns();
+				buildCommitPatterns(commitNetwork);
 				
 				// get pass/fail from technical db
-				commitNetwork.setPass(db.getCommitStatus(currentCommit.getCommit_id()));
+				commitNetwork.setPass(techDb.getCommitStatus(currentCommit.getCommit_id()));
 				
 				// Insert into graph tables.
-				// TODO @braden
+				stcaDb.insertNetwork(commitNetwork);
 			}
 		}
+	}
+	
+	public void buildCommitPatterns(Network network)
+	{
+		STPattern newSTPattern = null;
+		for (Integer threadId : network.getThreadPersonMap().keySet())
+		{						
+			// for each thread, construct links between the people involved.
+			List<Person> personList = new LinkedList<Person>(network.getThreadPersonMap().get(threadId));
+			
+			for (int currentPersonPos = 0;currentPersonPos < personList.size() - 1;currentPersonPos++)
+			{
+				// create the connected set.
+				Person currentPerson = personList.get(currentPersonPos);
+				personList.remove(currentPersonPos);
+				for (Person p : personList)
+				{
+					newSTPattern = new STPattern();
+					newSTPattern.setPatternType(patternTypes.SOCIAL_ONLY);
+					newSTPattern.setPerson1Id(currentPerson.getEmail());
+					newSTPattern.setPerson2Id(p.getEmail());
+				}
+				network.getSocialNetworkCommitPattern().getStPatterns().put(newSTPattern.getPerson1Id() + newSTPattern.getPerson2Id(), newSTPattern);
+			}
+		}
+		network.setTechnicalNetworkCommitPattern(techDb.getTechnicalNetworkForCommit(network.getCommitId()));
 	}
 }
