@@ -48,21 +48,12 @@ public class TechnicalAnalyzerDb extends TechnicalDb
 				
 				// add all the network found from the edges.
 				UnorderedPair<String, String> patternKey = new UnorderedPair<String, String>(person1, person2);
-				String patternKeyReverse = person2 + person1;
 				if(stPatterns.containsKey(patternKey))
 				{
 					if(isFuzzy.equalsIgnoreCase("f"))
 						stPatterns.get(patternKey).addWeight(weight);
 					else
 						 stPatterns.get(patternKey).addFuzzyWeight(weight);
-				}
-				else
-				if(stPatterns.containsKey(patternKeyReverse))
-				{
-					if(isFuzzy.equalsIgnoreCase("f"))
-						stPatterns.get(patternKeyReverse).addWeight(weight);
-					else
-						 stPatterns.get(patternKeyReverse).addFuzzyWeight(weight);					
 				}
 				else 
 				{

@@ -302,11 +302,36 @@ public class SocialAnalyzerDb extends SocialDb
 		}
 	}
 	
+	public void insertCommitPattern(STPattern pattern)
+	{
+		try
+		{
+			String sql = "INSERT INTO patterns (commit_id, p_id1, p_id2, type, social_weight, technical_weight, technical_weight_fuzzy) " +
+									   "VALUES (?, ?, ?, ?, ?, ?, ?);";
+			ISetter[] innerParms = {
+					new StringSetter(1, pattern.getCommitId()),
+					new StringSetter(2, pattern.getPerson1Id()), 
+					new StringSetter(3, pattern.getPerson2Id()), 
+					new StringSetter(4, pattern.getPatternType().toString()),
+					new StringSetter(5, Float.toString(pattern.getSocialWeight())), 
+					new StringSetter(6, Float.toString(pattern.getTechnicalWeight())),
+					new StringSetter(7, Float.toString(pattern.getTechnicalFuzzyWeight())),
+			};
+			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, innerParms);
+			this.addExecutionItem(ei);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public boolean insertNetwork(Network network)
 	{	
 		for (UnorderedPair<String, String> key : network.getNetworkCommitPattern().getStPatterns().keySet())
 		{
 			insertSTPattern(network.getNetworkCommitPattern().getStPatterns().get(key), network.isPass());
+			insertCommitPattern(network.getNetworkCommitPattern().getStPatterns().get(key));
 		}
 		return true;
 	}
