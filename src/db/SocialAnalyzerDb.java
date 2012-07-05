@@ -311,7 +311,7 @@ public class SocialAnalyzerDb extends SocialDb
 	{
 		try
 		{
-			String sql = "INSERT INTO patterns (commit_id, p_id1, p_id2, type, social_weight, technical_weight, technical_weight_fuzzy) " +
+			String sql = "INSERT INTO commit_patterns (commit_id, p_id1, p_id2, type, social_weight, technical_weight, technical_weight_fuzzy) " +
 									   "VALUES (?, ?, ?, ?, ?, ?, ?);";
 			ISetter[] innerParms = {
 					new StringSetter(1, pattern.getCommitId()),
