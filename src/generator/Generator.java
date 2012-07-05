@@ -70,34 +70,36 @@ public class Generator
 			// for each thread, construct links between the people involved.
 			List<Person> personList = new LinkedList<Person>(network.getThreadPersonMap().get(threadId));
 			
-			for (int currentPersonPos = 0;currentPersonPos < personList.size() - 1;currentPersonPos++)
+			for (int currentPersonPos = 0;currentPersonPos < personList.size()-1;currentPersonPos++)
 			{
+				List<Person> innerPersonsList = new LinkedList<Person>(personList);
+				
 				// create the connected set.
 				Person currentPerson = personList.get(currentPersonPos);
-				personList.remove(currentPersonPos);
-				for (Person p : personList)
+				innerPersonsList.remove(0);
+				for (Person p : innerPersonsList)
 				{
 					newSTPattern = new STPattern();
 					newSTPattern.setPatternType(patternTypes.SOCIAL_ONLY);
 					newSTPattern.setPerson1Id(currentPerson.getEmail());
 					newSTPattern.setPerson2Id(p.getEmail());
-				}
-				
-				// Construct the key 
-				UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
-				
-				// combine our pattern into the technical one.
-				if (technicalCommitPattern.getStPatterns().containsKey(pair))
-				{
-					// its in our technical pattern already, combine the patterns
-					STPattern techPattern = technicalCommitPattern.getStPatterns().get(pair);
-					techPattern.setPatternType(patternTypes.SOCIAL_TECHNICAL);
-					technicalCommitPattern.getStPatterns().put(pair, techPattern);
-				}
-				else
-				{
-					//add a new pattern in
-					technicalCommitPattern.getStPatterns().put(pair, newSTPattern);
+					
+					// Construct the key 
+					UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
+					
+					// combine our pattern into the technical one.
+					if (technicalCommitPattern.getStPatterns().containsKey(pair))
+					{
+						// its in our technical pattern already, combine the patterns
+						STPattern techPattern = technicalCommitPattern.getStPatterns().get(pair);
+						techPattern.setPatternType(patternTypes.SOCIAL_TECHNICAL);
+						technicalCommitPattern.getStPatterns().put(pair, techPattern);
+					}
+					else
+					{
+						//add a new pattern in
+						technicalCommitPattern.getStPatterns().put(pair, newSTPattern);
+					}
 				}
 			}
 		}

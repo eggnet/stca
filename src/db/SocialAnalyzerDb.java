@@ -174,6 +174,7 @@ public class SocialAnalyzerDb extends SocialDb
 						threadPersonMap.put(currentThreadId, personSet);
 					personSet = new HashSet<Person>();
 					itemSet = new HashSet<Item>();
+					currentThreadId = nextThreadId;
 				}
 				itemSet.add(new Item(
 					rs.getInt("p_id"),
@@ -183,11 +184,13 @@ public class SocialAnalyzerDb extends SocialDb
 					rs.getString("title"),
 					Resources.CommType.valueOf(rs.getString("type"))
 				));
-				personSet.add(new Person(
+				Person newPerson = new Person(
 					rs.getInt("p_id"),
 					rs.getString("name"),
 					rs.getString("email")
-				));
+				);
+				if (!(personSet.contains(newPerson)))
+					personSet.add(newPerson);
 			}
 			network.setThreadItemMap(threadItemMap);
 			network.setThreadPersonMap(threadPersonMap);
@@ -252,10 +255,12 @@ public class SocialAnalyzerDb extends SocialDb
 	{
 		try
 		{
-			String sql = "SELECT * from patterns where p_id1=? and p_id2=?";
+			String sql = "SELECT * from patterns where (p_id1=? and p_id2=?) OR (p_id1=? and p_id2=?)";
 			ISetter[] parms = {
 					new StringSetter(1, pattern.getPerson1Id()), 
-					new StringSetter(2, pattern.getPerson2Id()), 
+					new StringSetter(2, pattern.getPerson2Id()),
+					new StringSetter(3, pattern.getPerson2Id()), 
+					new StringSetter(4, pattern.getPerson1Id())
 			};
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, parms);
 			this.addExecutionItem(ei);
@@ -270,25 +275,25 @@ public class SocialAnalyzerDb extends SocialDb
 					countPassed++;
 				else
 					countFailed++;
-				sql = "UPDATE patterns SET passed=? and failed=? where p_id1=? and p_id2=?";
+				sql = "UPDATE patterns SET passed=?, failed=? where p_id1=? and p_id2=?";
 				ISetter[] innerParms = {
-						new StringSetter(1, pattern.getPerson1Id()), 
-						new StringSetter(2, pattern.getPerson2Id()), 
-						new IntSetter(3, countPassed), 
-						new IntSetter(4, countFailed)
+						new IntSetter(1, countPassed), 
+						new IntSetter(2, countFailed),
+						new StringSetter(3, pattern.getPerson1Id()), 
+						new StringSetter(4, pattern.getPerson2Id()), 
 				};
 				ei = new PreparedStatementExecutionItem(sql, innerParms);
 				this.addExecutionItem(ei);
 			}
 			else
 			{
-				sql = "INSERT INTO patterns VALUES (default, ?, ?, ?, ?, ?)";
+				sql = "INSERT INTO patterns VALUES (?, ?, ?, ?, ?)";
 				ISetter[] innerParms = {
 						new StringSetter(1, pattern.getPerson1Id()), 
 						new StringSetter(2, pattern.getPerson2Id()), 
-						new StringSetter(3, pattern.getCommitId()), 
-						new StringSetter(4, pattern.getPatternType().toString()),
-						new BooleanSetter(5, isPassingCommit)
+						new StringSetter(3, pattern.getPatternType().toString()),
+						new IntSetter(4, (isPassingCommit ? 1 : 0)),
+						new IntSetter(5, (isPassingCommit ? 0 : 1))
 				};
 				ei = new PreparedStatementExecutionItem(sql, innerParms);
 				this.addExecutionItem(ei);
