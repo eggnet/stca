@@ -26,6 +26,8 @@ public class Main {
 					techDb.connect(args[1]);
 					Generator gen = new Generator(socialDb, techDb);
 					gen.generate();
+					socialDb.close();
+					techDb.close();
 				} 
 				catch (MissingFormatArgumentException e) 
 				{

@@ -31,7 +31,7 @@ public class TechnicalAnalyzerDb extends TechnicalDb
 			Map<UnorderedPair<String, String>, STPattern> stPatterns = new HashMap<UnorderedPair<String, String>, STPattern>();
 			String sql = "SELECT source, target, weight, is_fuzzy FROM " +
 					"networks natural join edges WHERE " +
-					"new_commit_id=?";
+					"new_commit_id=? and source != target";
 			
 			ISetter[] params = {new StringSetter(1, commitId)};
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, params);
