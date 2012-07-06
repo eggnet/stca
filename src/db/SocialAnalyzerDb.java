@@ -12,13 +12,12 @@ import models.Item;
 import models.Network;
 import models.Person;
 import models.STPattern;
-import models.STPattern.patternTypes;
 import models.UnorderedPair;
 import models.WeightCriteria;
 import db.util.ISetter;
+import db.util.ISetter.FloatSetter;
 import db.util.ISetter.IntSetter;
 import db.util.ISetter.StringSetter;
-import db.util.ISetter.FloatSetter;
 import db.util.PreparedStatementExecutionItem;
 
 public class SocialAnalyzerDb extends SocialDb
@@ -257,12 +256,10 @@ public class SocialAnalyzerDb extends SocialDb
 	{
 		try
 		{
-			String sql = "SELECT * from patterns where (p_id1=? and p_id2=?) OR (p_id1=? and p_id2=?)";
+			String sql = "SELECT * from patterns where p_id1=? and p_id2=?";
 			ISetter[] parms = {
 					new StringSetter(1, pattern.getPerson1Id()), 
-					new StringSetter(2, pattern.getPerson2Id()),
-					new StringSetter(3, pattern.getPerson2Id()), 
-					new StringSetter(4, pattern.getPerson1Id())
+					new StringSetter(2, pattern.getPerson2Id())
 			};
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, parms);
 			this.addExecutionItem(ei);
@@ -271,34 +268,40 @@ public class SocialAnalyzerDb extends SocialDb
 			
 			if (rs.next())
 			{
-				int countPassed = rs.getInt("passed");
-				int countFailed = rs.getInt("failed");
-				if (isPassingCommit)
-					countPassed++;
-				else
-					countFailed++;
-				sql = "UPDATE patterns SET passed=?, failed=? where p_id1=? and p_id2=?";
-				ISetter[] innerParms = {
-						new IntSetter(1, countPassed), 
-						new IntSetter(2, countFailed),
-						new StringSetter(3, pattern.getPerson1Id()), 
-						new StringSetter(4, pattern.getPerson2Id()), 
-				};
-				ei = new PreparedStatementExecutionItem(sql, innerParms);
-				this.addExecutionItem(ei);
+				updatePattern(rs, pattern, isPassingCommit);
 			}
-			else
+			else 
 			{
-				sql = "INSERT INTO patterns VALUES (?, ?, ?, ?, ?)";
-				ISetter[] innerParms = {
-						new StringSetter(1, pattern.getPerson1Id()), 
-						new StringSetter(2, pattern.getPerson2Id()), 
-						new StringSetter(3, pattern.getPatternType().toString()),
-						new IntSetter(4, (isPassingCommit ? 1 : 0)),
-						new IntSetter(5, (isPassingCommit ? 0 : 1))
+				sql = "SELECT * from patterns where p_id1=? and p_id2=?";
+				ISetter[] parms1 = {
+						new StringSetter(1, pattern.getPerson2Id()), 
+						new StringSetter(2, pattern.getPerson1Id())
 				};
-				ei = new PreparedStatementExecutionItem(sql, innerParms);
+				ei = new PreparedStatementExecutionItem(sql, parms);
 				this.addExecutionItem(ei);
+				ei.waitUntilExecuted();
+				rs = ei.getResult();
+				
+				if (rs.next())
+				{
+					String p = pattern.getPerson1Id();
+					pattern.setPerson1Id(pattern.getPerson2Id());
+					pattern.setPerson2Id(p);
+					updatePattern(rs, pattern, isPassingCommit);
+				}
+				else
+				{
+					sql = "INSERT INTO patterns VALUES (?, ?, ?, ?, ?)";
+					ISetter[] innerParms = {
+							new StringSetter(1, pattern.getPerson1Id()), 
+							new StringSetter(2, pattern.getPerson2Id()), 
+							new StringSetter(3, pattern.getPatternType().toString()),
+							new IntSetter(4, (isPassingCommit ? 1 : 0)),
+							new IntSetter(5, (isPassingCommit ? 0 : 1))
+					};
+					ei = new PreparedStatementExecutionItem(sql, innerParms);
+					this.addExecutionItem(ei);
+				}
 			}
 			return true;
 		}
@@ -307,6 +310,36 @@ public class SocialAnalyzerDb extends SocialDb
 			e.printStackTrace();
 			return false;
 		}
+	}
+	
+	/**
+	 * Updates a pattern in the patterns table.
+	 * @param rs
+	 * @param pattern
+	 * @param isPassingCommit
+	 * @return true 
+	 * 			on success
+	 * @throws SQLException
+	 * 			on failed update.
+	 */
+	public boolean updatePattern(ResultSet rs, STPattern pattern, boolean isPassingCommit) throws SQLException
+	{
+		int countPassed = rs.getInt("passed");
+		int countFailed = rs.getInt("failed");
+		if (isPassingCommit)
+			countPassed++;
+		else
+			countFailed++;
+		String sql = "UPDATE patterns SET passed=?, failed=? where p_id1=? and p_id2=?";
+		ISetter[] innerParms = {
+				new IntSetter(1, countPassed), 
+				new IntSetter(2, countFailed),
+				new StringSetter(3, pattern.getPerson1Id()), 
+				new StringSetter(4, pattern.getPerson2Id()), 
+		};
+		PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, innerParms);
+		this.addExecutionItem(ei);
+		return true;
 	}
 	
 	public void insertCommitPattern(STPattern pattern)
@@ -342,7 +375,6 @@ public class SocialAnalyzerDb extends SocialDb
 			{
 				insertSTPattern(pattern, network.isPass());
 			}
-			
 			// Always insert the commit pattern regardless of their weights
 			insertCommitPattern(pattern);
 		}

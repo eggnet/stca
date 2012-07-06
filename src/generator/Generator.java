@@ -2,7 +2,6 @@ package generator;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import models.Commit;
 import models.CommitPattern;
@@ -12,11 +11,9 @@ import models.STPattern;
 import models.STPattern.patternTypes;
 import models.UnorderedPair;
 import models.WeightCriteria;
-import db.DbConnection;
 import db.Resources;
 import db.SocialAnalyzerDb;
 import db.TechnicalAnalyzerDb;
-import db.TechnicalDb;
 
 /**
  * <code>Generator</code will go through each commit
@@ -44,12 +41,16 @@ public class Generator
 	public void generate() { 
 		int pagingOffset = 0;
 		List<Commit> commits;
+		int countCommits = techDb.getCommitCount();
+		int doneCommits = 1;
 		while (pagingOffset != -1)
 		{
 			commits = techDb.getCommits(Resources.DB_LIMIT, pagingOffset);
 			if (commits.size() < Resources.DB_LIMIT) pagingOffset = -1;
 			for (Commit currentCommit : commits)
 			{
+				Resources.log("Commit (%d/%d) : %s (%s)", doneCommits, countCommits, currentCommit.getCommit_id(), currentCommit.getCommit_date().toString());
+				
 				// Get all the related items and their threads.
 				Network commitNetwork = stcaDb.getNetwork(currentCommit.getCommit_id());
 				buildCommitPatterns(commitNetwork);
@@ -59,6 +60,8 @@ public class Generator
 				
 				// Insert into graph tables.
 				stcaDb.insertNetwork(commitNetwork, weightCriteria);
+				doneCommits++;
+				if (doneCommits >= countCommits) return;
 			}
 			pagingOffset += Resources.DB_LIMIT;
 		}

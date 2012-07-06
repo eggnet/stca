@@ -62,8 +62,8 @@ public class Main {
 				// Check for Help
 				if(line.hasOption("h"))
 				{
-			    	printMan();
-			    	return;
+					printMan();
+					return;
 				}
 				
 				// Check for Social
@@ -151,8 +151,11 @@ public class Main {
 				float flowerW = Float.parseFloat(FuzzylowerWeight);
 				float fupperW = Float.parseFloat(FuzzyupperWeight);
 				
-				Generator gen = new Generator(socialDb, techDb,tlowerW, tupperW, slowerW, supperW,flowerW, fupperW);
+				Generator gen = new Generator(socialDb, techDb, tlowerW, tupperW, slowerW, supperW,flowerW, fupperW);
 				gen.generate();
+				
+				socialDb.close();
+				techDb.close();
 			}
 		}
 		catch (NumberFormatException ne)
