@@ -48,14 +48,23 @@ public class Main {
 				Option weightTech 	    = OptionBuilder.withArgName("tw").hasArgs(2).create("tw");
 				Option weightSocial 	= OptionBuilder.withArgName("sw").hasArgs(2).create("sw");
 				Option weightFuzzy 		= OptionBuilder.withArgName("fw").hasArgs(2).create("fw");
+				Option help				= OptionBuilder.withArgName("h").hasArg().create("h");
 				
 				options.addOption(socialDbArg);
 				options.addOption(technicalDbArg);
 				options.addOption(weightTech);
 				options.addOption(weightSocial);
 				options.addOption(weightFuzzy);
+				options.addOption(help);
 				
 				CommandLine line = parser.parse(options, args);
+				
+				// Check for Help
+				if(line.hasOption("h"))
+				{
+			    	printMan();
+			    	return;
+				}
 				
 				// Check for Social
 				if(line.hasOption("s"))
