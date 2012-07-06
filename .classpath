@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="/libs/database/database.jar" sourcepath="/database/src"/>
 	<classpathentry kind="lib" path="/libs/differ/differ.jar"/>
 	<classpathentry kind="lib" path="postgresql-9.1-902.jdbc4.jar"/>
+	<classpathentry kind="lib" path="/com2pgsql/libs/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="/com2pgsql/libs/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

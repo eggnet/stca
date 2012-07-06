@@ -1,0 +1,35 @@
+NAME
+	stca
+	
+SYNOPSIS
+	stca [OPTION]
+	
+DESCRIPTION
+	Analyze PostgreSQL databases which contain information regarding aspects of social connectivity over
+	a technical project.
+	
+	-s SOCIALNAME
+		name of the social database
+		
+	-t NAME
+		name of the technical database
+		
+	-tw LOWER UPPER
+		TECHNICAL weight constraints. LOWER and UPPER limits are from [0.0,10.0]. If this flag is specified, the stca only analyzes
+		those links that have technical weight between LOWER and UPPER. Otherwise stca will consider all the links regardless of their weights.
+		
+	-sw LOWER UPPER
+		SOCIAL weight constraints. LOWER and UPPER limits are from [0.0,10.0]. If this flag is specified, the stca only analyzes
+		those links that have social weight between LOWER and UPPER. Otherwise stca will consider all the links regardless of their weights.
+		
+	-fw LOWER UPPER
+		technical FUZZY weight constraints. LOWER and UPPER limits are from [0.0,10.0]. If this flag is specified, the stca only analyzes
+		those links that have technical fuzzy weight between LOWER and UPPER. Otherwise stca will consider all the links regardless of their weights.
+		
+		User can specify either -tw, -sw, -fw or none of them. (without any flag, stca will consider All weight)
+		Example "stca -s hibernate_12_2012 -t hibernateorm -tw 0.0 2.0 -sw 0.0 10 -fw 0.0 2"
+AUTHOR
+	Written by Jordan Ell, Triet Huynh, and Braden Simpson.
+	
+SEE ALSO
+	The full documentation for stca is maintained at https://github.com/eggnet/stca/wiki
