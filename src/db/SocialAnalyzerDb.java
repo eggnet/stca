@@ -1,7 +1,6 @@
 package db;
 
 import java.io.InputStreamReader;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -14,8 +13,9 @@ import models.Network;
 import models.Person;
 import models.STPattern;
 import models.UnorderedPair;
+import models.WeightCriteria;
 import db.util.ISetter;
-import db.util.ISetter.BooleanSetter;
+import db.util.ISetter.FloatSetter;
 import db.util.ISetter.IntSetter;
 import db.util.ISetter.StringSetter;
 import db.util.PreparedStatementExecutionItem;
@@ -342,11 +342,41 @@ public class SocialAnalyzerDb extends SocialDb
 		return true;
 	}
 	
-	public boolean insertNetwork(Network network)
+	public void insertCommitPattern(STPattern pattern)
+	{
+		try
+		{
+			String sql = "INSERT INTO commit_patterns (commit_id, p_id1, p_id2, type, social_weight, technical_weight, technical_weight_fuzzy) " +
+									   "VALUES (?, ?, ?, ?, ?, ?, ?);";
+			ISetter[] innerParms = {
+					new StringSetter(1, pattern.getCommitId()),
+					new StringSetter(2, pattern.getPerson1Id()), 
+					new StringSetter(3, pattern.getPerson2Id()), 
+					new StringSetter(4, pattern.getPatternType().toString()),
+					new FloatSetter (5, pattern.getSocialWeight()), 
+					new FloatSetter (6, pattern.getTechnicalWeight()),
+					new FloatSetter (7, pattern.getTechnicalFuzzyWeight()),
+			};
+			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, innerParms);
+			this.addExecutionItem(ei);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean insertNetwork(Network network, WeightCriteria wc)
 	{	
 		for (UnorderedPair<String, String> key : network.getNetworkCommitPattern().getStPatterns().keySet())
 		{
-			insertSTPattern(network.getNetworkCommitPattern().getStPatterns().get(key), network.isPass());
+			STPattern pattern = network.getNetworkCommitPattern().getStPatterns().get(key);
+			if(wc.satisfiedCriteria(pattern))
+			{
+				insertSTPattern(pattern, network.isPass());
+			}
+			// Always insert the commit pattern regardless of their weights
+			insertCommitPattern(pattern);
 		}
 		return true;
 	}

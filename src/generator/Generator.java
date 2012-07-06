@@ -2,7 +2,6 @@ package generator;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import models.Commit;
 import models.CommitPattern;
@@ -11,11 +10,10 @@ import models.Person;
 import models.STPattern;
 import models.STPattern.patternTypes;
 import models.UnorderedPair;
-import db.DbConnection;
+import models.WeightCriteria;
 import db.Resources;
 import db.SocialAnalyzerDb;
 import db.TechnicalAnalyzerDb;
-import db.TechnicalDb;
 
 /**
  * <code>Generator</code will go through each commit
@@ -25,12 +23,15 @@ import db.TechnicalDb;
  */
 public class Generator
 {
-	public SocialAnalyzerDb stcaDb;
-	public TechnicalAnalyzerDb techDb;
-	
-	public Generator(SocialAnalyzerDb stcaDb, TechnicalAnalyzerDb db) {
+	private SocialAnalyzerDb stcaDb;
+	private TechnicalAnalyzerDb techDb;
+	private WeightCriteria weightCriteria;
+
+	public Generator(SocialAnalyzerDb stcaDb, TechnicalAnalyzerDb db, float techlower, float techUpper, 
+								float socialLower, float socialUpper,float fuzzylower, float fuzzyUpper) {
 		this.stcaDb = stcaDb;
 		this.techDb = db;
+		this.weightCriteria = new WeightCriteria(techlower, techUpper, socialLower, socialUpper, fuzzylower, fuzzyUpper);
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class Generator
 				commitNetwork.setPass(techDb.getCommitStatus(currentCommit.getCommit_id()));
 				
 				// Insert into graph tables.
-				stcaDb.insertNetwork(commitNetwork);
+				stcaDb.insertNetwork(commitNetwork, weightCriteria);
 				doneCommits++;
 				if (doneCommits >= countCommits) return;
 			}
