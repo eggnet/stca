@@ -58,7 +58,7 @@ public class TechnicalAnalyzerDb extends TechnicalDb
 				else 
 				{
 					// add new pattern
-					STPattern pattern = new STPattern(person1, person2, patternTypes.TECHNICAL_ONLY, weightLevels.UNKNOWN, 0, 0, 0);
+					STPattern pattern = new STPattern(commitId, person1, person2, patternTypes.TECHNICAL_ONLY, weightLevels.UNKNOWN, 0, 0, 0);
 					if(isFuzzy.equalsIgnoreCase("f"))
 						pattern.addWeight(weight);
 					else

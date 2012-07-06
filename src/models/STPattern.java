@@ -23,7 +23,7 @@ public class STPattern {
 		UNKNOWN,
 	}
 	
-	public STPattern(String person1Id, String person2Id,
+	public STPattern(String commitid, String person1Id, String person2Id,
 			patternTypes patternType, weightLevels weightLevel,
 			float socialWeight, float technicalWeight, float technicalFuzzyWeight) {
 		super();
@@ -34,6 +34,7 @@ public class STPattern {
 		this.socialWeight = socialWeight;
 		this.technicalWeight = technicalWeight;
 		this.technicalFuzzyWeight = technicalFuzzyWeight;
+		this.commitId = commitid;
 	}
 	
 	public void addWeight(float weight)
