@@ -90,7 +90,7 @@ public class Generator
 					newSTPattern.setPatternType(patternTypes.SOCIAL_ONLY);
 					newSTPattern.setPerson1Id(currentPerson.getEmail());
 					newSTPattern.setPerson2Id(p.getEmail());
-					
+					newSTPattern.setCommitId(network.getCommitId());
 					// Construct the key 
 					UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
 					
