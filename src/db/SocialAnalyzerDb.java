@@ -146,10 +146,12 @@ public class SocialAnalyzerDb extends SocialDb
 	public Network getNetwork(String commitId)
 	{
 		String sql = 
-				"select name, email, items.p_id, item_date, items.item_id, body, title, type, thread_id from items" +
-				" join people on items.p_id=people.p_id join threads on items.item_id=threads.item_id where" +
-				" items.item_id IN (select item_id from threads where thread_id IN " +
-				"(select distinct threads.thread_id from links join threads on links.item_id=threads.thread_id where commit_id=?))";
+				"select name, email, p_id, item_date, linked_items.item_id, body, title, type, thread_id from (" +
+				"select name, email, items.p_id, item_date, items.item_id, body, title, type from items" +
+				" join people on items.p_id=people.p_id join links on items.item_id=links.item_id and" +
+				" commit_id=?) as linked_items left " +
+				"join threads on linked_items.item_id=threads.item_id";
+		
 		ISetter[] parms = { new StringSetter(1, commitId) };
 		PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, parms);
 		addExecutionItem(ei);
@@ -359,6 +361,7 @@ public class SocialAnalyzerDb extends SocialDb
 			};
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, innerParms);
 			this.addExecutionItem(ei);
+			ei.waitUntilExecuted();
 		}
 		catch (Exception e)
 		{
