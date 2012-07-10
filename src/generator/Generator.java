@@ -1,7 +1,9 @@
 package generator;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import models.Commit;
 import models.CommitPattern;
@@ -71,7 +73,8 @@ public class Generator
 	{
 		STPattern newSTPattern = null;
 		CommitPattern technicalCommitPattern = techDb.getTechnicalNetworkForCommit(network.getCommitId());
-
+		Map<String, Integer> personItemsMap = network.getPersonItemsMap();
+		
 		for (Integer threadId : network.getThreadPersonMap().keySet())
 		{						
 			// for each thread, construct links between the people involved.
@@ -91,20 +94,23 @@ public class Generator
 					newSTPattern.setPerson1Id(currentPerson.getEmail());
 					newSTPattern.setPerson2Id(p.getEmail());
 					newSTPattern.setCommitId(network.getCommitId());
+					newSTPattern.addSocialWeight();
 					// Construct the key 
 					UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
 					
 					// combine our pattern into the technical one.
 					if (technicalCommitPattern.getStPatterns().containsKey(pair))
 					{
+						//Todo Are we missing a social_only pair from different threads ?
+						
 						// its in our technical pattern already, combine the patterns
 						STPattern techPattern = technicalCommitPattern.getStPatterns().get(pair);
 						techPattern.setPatternType(patternTypes.SOCIAL_TECHNICAL);
+						techPattern.addSocialWeight();
 						technicalCommitPattern.getStPatterns().put(pair, techPattern);
 					}
 					else
 					{
-						//add a new pattern in
 						technicalCommitPattern.getStPatterns().put(pair, newSTPattern);
 					}
 				}

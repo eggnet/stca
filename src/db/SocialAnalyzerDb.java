@@ -158,6 +158,8 @@ public class SocialAnalyzerDb extends SocialDb
 		Network network = new Network();
 		Map<Integer, Set<Item>> threadItemMap = new HashMap<Integer, Set<Item>>();
 		Map<Integer, Set<Person>> threadPersonMap = new HashMap<Integer, Set<Person>>();
+		Map<String, Integer> personItemsMap = new HashMap<String, Integer>();
+		
 		try 
 		{
 			ResultSet rs = ei.getResult();
@@ -190,11 +192,27 @@ public class SocialAnalyzerDb extends SocialDb
 					rs.getString("name"),
 					rs.getString("email")
 				);
+				
+				// Add person for this thread
 				if (!(personSet.contains(newPerson)))
+				{
 					personSet.add(newPerson);
+				}
+				
+				// Add item created by this person as his socialweight per commit
+				String newPersonEmail = newPerson.getEmail();
+				if(personItemsMap.containsKey(newPersonEmail))
+				{
+					personItemsMap.put(newPersonEmail, personItemsMap.get(newPersonEmail)+1);
+				}
+				else
+				{
+					personItemsMap.put(newPersonEmail,1);
+				}
 			}
 			network.setThreadItemMap(threadItemMap);
 			network.setThreadPersonMap(threadPersonMap);
+			network.setPersonItemsMap(personItemsMap);
 			network.setCommitId(commitId);
 			return network;
 		}
@@ -277,7 +295,7 @@ public class SocialAnalyzerDb extends SocialDb
 						new StringSetter(1, pattern.getPerson2Id()), 
 						new StringSetter(2, pattern.getPerson1Id())
 				};
-				ei = new PreparedStatementExecutionItem(sql, parms);
+				ei = new PreparedStatementExecutionItem(sql, parms1);
 				this.addExecutionItem(ei);
 				ei.waitUntilExecuted();
 				rs = ei.getResult();
@@ -353,7 +371,7 @@ public class SocialAnalyzerDb extends SocialDb
 					new StringSetter(2, pattern.getPerson1Id()), 
 					new StringSetter(3, pattern.getPerson2Id()), 
 					new StringSetter(4, pattern.getPatternType().toString()),
-					new FloatSetter (5, pattern.getSocialWeight()), 
+					new FloatSetter (5, pattern.getSocialWeight()),
 					new FloatSetter (6, pattern.getTechnicalWeight()),
 					new FloatSetter (7, pattern.getTechnicalFuzzyWeight()),
 			};
