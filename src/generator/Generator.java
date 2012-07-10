@@ -73,44 +73,57 @@ public class Generator
 	{
 		STPattern newSTPattern = null;
 		CommitPattern technicalCommitPattern = techDb.getTechnicalNetworkForCommit(network.getCommitId());
-		Map<String, Integer> personItemsMap = network.getPersonItemsMap();
 		
 		for (Integer threadId : network.getThreadPersonMap().keySet())
 		{						
 			// for each thread, construct links between the people involved.
-			List<Person> personList = new LinkedList<Person>(network.getThreadPersonMap().get(threadId));
+			List<Person> personList = new LinkedList<Person>(network.getThreadPersonMap().get(threadId).keySet());
 			
 			for (int currentPersonPos = 0;currentPersonPos < personList.size()-1;currentPersonPos++)
 			{
-				List<Person> innerPersonsList = new LinkedList<Person>(personList);
+				List<Person> innerPersonsList = new LinkedList<Person>(personList.subList(currentPersonPos, personList.size() -1 ));
 				
 				// create the connected set.
 				Person currentPerson = personList.get(currentPersonPos);
 				innerPersonsList.remove(0);
 				for (Person p : innerPersonsList)
 				{
+					// Construct SOCIAL ONLY pattern
 					newSTPattern = new STPattern();
 					newSTPattern.setPatternType(patternTypes.SOCIAL_ONLY);
 					newSTPattern.setPerson1Id(currentPerson.getEmail());
 					newSTPattern.setPerson2Id(p.getEmail());
 					newSTPattern.setCommitId(network.getCommitId());
-					newSTPattern.addSocialWeight();
+					
+					int pItems = network.getThreadPersonMap().get(threadId).get(p);
+					int currentPItems = network.getThreadPersonMap().get(threadId).get(currentPerson);
+					newSTPattern.addSocialWeight(pItems + currentPItems);
+					
 					// Construct the key 
 					UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
 					
-					// combine our pattern into the technical one.
+					// combine social pattern into the technical one.
 					if (technicalCommitPattern.getStPatterns().containsKey(pair))
 					{
-						//Todo Are we missing a social_only pair from different threads ?
-						
 						// its in our technical pattern already, combine the patterns
 						STPattern techPattern = technicalCommitPattern.getStPatterns().get(pair);
-						techPattern.setPatternType(patternTypes.SOCIAL_TECHNICAL);
-						techPattern.addSocialWeight();
-						technicalCommitPattern.getStPatterns().put(pair, techPattern);
+						if(techPattern.getPatternType() == STPattern.patternTypes.TECHNICAL_ONLY)
+						{
+							techPattern.setPatternType(patternTypes.SOCIAL_TECHNICAL);
+							techPattern.addSocialWeight(pItems + currentPItems);
+							technicalCommitPattern.getStPatterns().put(pair, techPattern);
+						}
+						else
+						if( techPattern.getPatternType() == STPattern.patternTypes.SOCIAL_ONLY ||
+							techPattern.getPatternType() == STPattern.patternTypes.SOCIAL_TECHNICAL)
+						{
+							techPattern.addSocialWeight(pItems + currentPItems);
+							technicalCommitPattern.getStPatterns().put(pair, techPattern);
+						}
 					}
 					else
 					{
+						// add SOCIAL_ONLY pattern to the network
 						technicalCommitPattern.getStPatterns().put(pair, newSTPattern);
 					}
 				}

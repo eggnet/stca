@@ -11,8 +11,7 @@ import java.util.Set;
 public class Network
 {
 	private Map<Integer, Set<Item>> threadItemMap;
-	private Map<Integer, Set<Person>> threadPersonMap;
-	private Map<String, Integer> personItemsMap;
+	private Map<Integer, Map<Person, Integer>> threadPersonMap;
 	
 	private boolean isPass;
 	private CommitPattern networkCommitPattern;
@@ -35,12 +34,12 @@ public class Network
 		this.threadItemMap = threadItemMap;
 	}
 
-	public Map<Integer, Set<Person>> getThreadPersonMap()
+	public Map<Integer, Map<Person, Integer>> getThreadPersonMap()
 	{
 		return threadPersonMap;
 	}
 
-	public void setThreadPersonMap(Map<Integer, Set<Person>> threadPersonMap)
+	public void setThreadPersonMap(Map<Integer, Map<Person, Integer>> threadPersonMap)
 	{
 		this.threadPersonMap = threadPersonMap;
 	}
@@ -74,13 +73,4 @@ public class Network
 	{
 		this.commitId = commitId;
 	}
-
-	public Map<String, Integer> getPersonItemsMap() {
-		return personItemsMap;
-	}
-
-	public void setPersonItemsMap(Map<String, Integer> personItemsMap) {
-		this.personItemsMap = personItemsMap;
-	}
-	
 }

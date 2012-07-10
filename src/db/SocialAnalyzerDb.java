@@ -157,14 +157,14 @@ public class SocialAnalyzerDb extends SocialDb
 		
 		Network network = new Network();
 		Map<Integer, Set<Item>> threadItemMap = new HashMap<Integer, Set<Item>>();
-		Map<Integer, Set<Person>> threadPersonMap = new HashMap<Integer, Set<Person>>();
-		Map<String, Integer> personItemsMap = new HashMap<String, Integer>();
+		Map<Integer, Map<Person, Integer>> threadPersonMap = new HashMap<Integer, Map<Person, Integer>>();
 		
 		try 
 		{
 			ResultSet rs = ei.getResult();
 			Set<Item> itemSet = null;
-			Set<Person> personSet = null;
+			Map<Person, Integer> personSet = null;
+			
 			int currentThreadId = -1;
 			while(rs.next())
 			{
@@ -175,10 +175,13 @@ public class SocialAnalyzerDb extends SocialDb
 						threadItemMap.put(currentThreadId, itemSet);
 					if (personSet != null && personSet.size() > 0)
 						threadPersonMap.put(currentThreadId, personSet);
-					personSet = new HashSet<Person>();
+					
+					personSet = new HashMap<Person, Integer>();
 					itemSet = new HashSet<Item>();
 					currentThreadId = nextThreadId;
 				}
+				
+				// Add current Item
 				itemSet.add(new Item(
 					rs.getInt("p_id"),
 					rs.getTimestamp("item_date"),
@@ -187,32 +190,28 @@ public class SocialAnalyzerDb extends SocialDb
 					rs.getString("title"),
 					Resources.CommType.valueOf(rs.getString("type"))
 				));
+				
+				// Add current person
 				Person newPerson = new Person(
 					rs.getInt("p_id"),
 					rs.getString("name"),
 					rs.getString("email")
 				);
 				
-				// Add person for this thread
-				if (!(personSet.contains(newPerson)))
+				if (!(personSet.containsKey(newPerson)))
 				{
-					personSet.add(newPerson);
-				}
-				
-				// Add item created by this person as his socialweight per commit
-				String newPersonEmail = newPerson.getEmail();
-				if(personItemsMap.containsKey(newPersonEmail))
-				{
-					personItemsMap.put(newPersonEmail, personItemsMap.get(newPersonEmail)+1);
+					personSet.put(newPerson, 1);
 				}
 				else
 				{
-					personItemsMap.put(newPersonEmail,1);
+					int numberItems = personSet.get(newPerson);
+					personSet.put(newPerson, numberItems + 1);
 				}
 			}
+			
+			// Return the net work
 			network.setThreadItemMap(threadItemMap);
 			network.setThreadPersonMap(threadPersonMap);
-			network.setPersonItemsMap(personItemsMap);
 			network.setCommitId(commitId);
 			return network;
 		}
