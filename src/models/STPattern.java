@@ -42,6 +42,11 @@ public class STPattern {
 		this.technicalWeight += weight;
 	}
 	
+	public void addSocialWeight()
+	{
+		this.socialWeight ++;
+	}
+	
 	public void addFuzzyWeight(float weight)
 	{
 		this.technicalFuzzyWeight += weight;
