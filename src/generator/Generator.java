@@ -79,13 +79,14 @@ public class Generator
 			// for each thread, construct links between the people involved.
 			List<Person> personList = new LinkedList<Person>(network.getThreadPersonMap().get(threadId).keySet());
 			
-			for (int currentPersonPos = 0;currentPersonPos < personList.size()-1;currentPersonPos++)
+			for (int currentPersonPos = 0;currentPersonPos < personList.size();currentPersonPos++)
 			{
-				List<Person> innerPersonsList = new LinkedList<Person>(personList.subList(currentPersonPos, personList.size() -1 ));
+				List<Person> innerPersonsList = new LinkedList<Person>(personList.subList(currentPersonPos, personList.size()));
 				
 				// create the connected set.
 				Person currentPerson = personList.get(currentPersonPos);
-				innerPersonsList.remove(0);
+				if(!innerPersonsList.isEmpty())
+					innerPersonsList.remove(0);
 				for (Person p : innerPersonsList)
 				{
 					// Construct SOCIAL ONLY pattern
