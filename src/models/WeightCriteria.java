@@ -5,11 +5,11 @@ import models.STPattern.patternTypes;
 public class WeightCriteria{
 	
 	static float TECHNICAL_LOWER_BOUND 			= 0;
-	static float TECHNICAL_UPPER_BOUND 			= 1000;
+	static float TECHNICAL_UPPER_BOUND 			= Integer.MAX_VALUE;
 	static float SOCIAL_LOWER_BOUND 			= 0;
-	static float SOCIAL_UPPER_BOUND 			= 1000;
-	static float TECHNICAL_FUZZY_LOWER_BOUND 	= 0;
-	static float TECHNICAL_FUZZY_UPPER_BOUND 	= 1000;
+	static float SOCIAL_UPPER_BOUND 			= Integer.MAX_VALUE;
+	static float TECHNICAL_FUZZY_LOWER_BOUND 	= Integer.MAX_VALUE; // ignore fuzzy unless specify
+	static float TECHNICAL_FUZZY_UPPER_BOUND 	= Integer.MAX_VALUE;
 	
 	public float technicalLower;
 	public float technicalUpper;
@@ -50,23 +50,22 @@ public class WeightCriteria{
 		}
 		else
 		if(pattern.getPatternType() == patternTypes.TECHNICAL_ONLY)
-
 		{
 			float techW = pattern.getTechnicalWeight();
 			float fuzzyW = pattern.getTechnicalFuzzyWeight();
 			if( techW > 0 && techW >= technicalLower && techW <= technicalUpper)
 				return true;
+			
 			if( fuzzyW > 0 && fuzzyW >= technicalFuzzyLower && fuzzyW <= technicalFuzzyUpper)
 				return true;
 
 			return false;
 		}
-		else
-		if(pattern.getPatternType() == patternTypes.SOCIAL_TECHNICAL &&
-		   pattern.getSocialWeight() >= socialLower &&
-		   pattern.getSocialWeight() <= socialUpper && 	
-		   pattern.getTechnicalWeight() >= technicalLower &&
-		   pattern.getTechnicalWeight() <= technicalUpper)
+		else // Check Social and Technical weight. Technical Fuzzy weight is considered if  the Technical weight doesnt satisfy
+		if((pattern.getPatternType() == patternTypes.SOCIAL_TECHNICAL) &&
+		   (pattern.getSocialWeight()    >= socialLower    && pattern.getSocialWeight()    <= socialUpper) && 	
+		   ((pattern.getTechnicalWeight() >= technicalLower && pattern.getTechnicalWeight() <= technicalUpper) ||
+  		    (pattern.getTechnicalFuzzyWeight() >= technicalFuzzyLower && pattern.getTechnicalFuzzyWeight() <= technicalFuzzyUpper))) 
 		{
 			return true;
 		}

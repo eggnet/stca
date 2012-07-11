@@ -99,45 +99,64 @@ public class Main {
 				// Check for technical weight threshold
 				if(line.hasOption("tw")) {
 				    String[] values = line.getOptionValues("tw");
-				    if(values.length != 2) {
-				    	System.out.println("-tw flag used incorrectly.");
-				    	printMan();
-				    	return;
-				    }
-				    else
+				    if(values.length == 2)
 				    {
 				    	techLowerWeight = values[0];
 				    	techUpperWeight = values[1];
+				    }
+				    else
+				    if(values.length == 1)
+				    {
+				    	techLowerWeight = values[0];
+				    }
+				    else
+				    {
+				    	System.out.println("-tw flag used incorrectly.");
+				    	printMan();
+				    	return;
 				    }
 				}
 				
 				// Check for social weight threshold
 				if(line.hasOption("sw")) {
 				    String[] values = line.getOptionValues("sw");
-				    if(values.length != 2) {
-				    	System.out.println("-sw flag used incorrectly.");
-				    	printMan();
-				    	return;
-				    }
-				    else
+
+				    if(values.length == 2)
 				    {
 				    	SociallowerWeight = values[0];
 				    	SocialupperWeight = values[1];
+				    }
+				    else
+				    if(values.length == 1)
+				    {
+				    	SociallowerWeight = values[0];
+				    }
+				    else	
+				    {
+				    	System.out.println("-sw flag used incorrectly.");
+				    	printMan();
+				    	return;
 				    }
 				}
 				
 				// Check for technical fuzzy weight threshold
 				if(line.hasOption("fw")) {
 				    String[] values = line.getOptionValues("fw");
-				    if(values.length != 2) {
-				    	System.out.println("-fw flag used incorrectly.");
-				    	printMan();
-				    	return;
-				    }
-				    else
+				    if(values.length == 2)
 				    {
 				    	FuzzylowerWeight = values[0];
 				    	FuzzyupperWeight = values[1];
+				    }
+				    else
+				    if(values.length == 1)
+				    {
+				    	FuzzylowerWeight = values[0];
+				    }
+					else
+					{
+				    	System.out.println("-fw flag used incorrectly.");
+				    	printMan();
+				    	return;
 				    }
 				}
 				// Run the analyzer
@@ -160,7 +179,7 @@ public class Main {
 		}
 		catch (NumberFormatException ne)
 		{
-			System.out.print("ERROR: -tw or -fw or -sw Lower Upper values must be float. Example: -tw 0.0 1.5");
+			System.out.print("ERROR: -tw or -fw or -sw Lower Upper values must be float. Example: -tw 0.0 1.5 or -tw 1.0");
 			printMan();
 		}
 		catch (Exception e)
@@ -171,7 +190,9 @@ public class Main {
 	}
 	
 	private static void printMan() {
-		System.out.println("stca arguement: [-s socialDbName] [-t technicalDbName] [-tw|-sw|-fw lowerWeight upperWeight]");          
+		System.out.println("stca arguement: [-s socialDbName] [-t technicalDbName] [-tw|-sw|-fw lowerWeight upperWeight]");    
+		System.out.println("for [-tw|-sw|-fw lowerWeight upperWeight] you can skip upperWeight");    
+		System.out.println("Ex: -s hibernateogm_7_4 -t hibernateogm -tw 0.0 10 -sw 0.0"); 
 		try {
 			// Print the man page
 			BufferedReader in = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("man.txt")));

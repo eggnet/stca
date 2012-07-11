@@ -15,16 +15,22 @@ DESCRIPTION
 		name of the technical database
 		
 	-tw LOWER UPPER
+		UPPER is optional, without it there is no max limit.
 		TECHNICAL weight constraints. LOWER and UPPER limits are from [0.0,10.0]. If this flag is specified, the stca only analyzes
-		those links that have technical weight between LOWER and UPPER. Otherwise stca will consider all the links regardless of their weights.
+		those links that have technical weight between LOWER and UPPER.
+		Wihtout the flag, stca will consider all the Technical links.
 		
 	-sw LOWER UPPER
+		UPPER is optional, without it there is no max limit.
 		SOCIAL weight constraints. LOWER and UPPER limits are from [0.0,10.0]. If this flag is specified, the stca only analyzes
-		those links that have social weight between LOWER and UPPER. Otherwise stca will consider all the links regardless of their weights.
+		those links that have social weight between LOWER and UPPER.
+		Without the flag, stca will consider all the Social Links.
 		
 	-fw LOWER UPPER
+		UPPER is optional, without it there is no max limit.
 		technical FUZZY weight constraints. LOWER and UPPER limits are from [0.0,10.0]. If this flag is specified, the stca only analyzes
-		those links that have technical fuzzy weight between LOWER and UPPER. Otherwise stca will consider all the links regardless of their weights.
+		those links that have technical fuzzy weight between LOWER and UPPER.
+		Without the flag, stca will NOT consider fuzzy links.
 		
 		User can specify either -tw, -sw, -fw or none of them. (without any flag, stca will consider All weight)
 		Example "stca -s hibernate_12_2012 -t hibernateorm -tw 0.0 2.0 -sw 0.0 10 -fw 0.0 2"
