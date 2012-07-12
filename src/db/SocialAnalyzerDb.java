@@ -171,7 +171,7 @@ public class SocialAnalyzerDb extends SocialDb
 			while(rs.next())
 			{
 				int nextThreadId = rs.getInt("thread_id");
-				if (currentThreadId != nextThreadId)
+				if (currentThreadId != nextThreadId && nextThreadId != 0)
 				{
 					if (itemSet != null && itemSet.size() > 0)
 						threadItemMap.put(currentThreadId, itemSet);
