@@ -83,10 +83,11 @@ public class Generator
 			{
 				List<Person> innerPersonsList = new LinkedList<Person>(personList.subList(currentPersonPos, personList.size()));
 				
-				// create the connected set.
+				// Remove the currentPerson from the list. If it's 1 person network, create them as well 
 				Person currentPerson = personList.get(currentPersonPos);
-				if(!innerPersonsList.isEmpty())
+				if(!innerPersonsList.isEmpty() && personList.size() !=1)
 					innerPersonsList.remove(0);
+				
 				for (Person p : innerPersonsList)
 				{
 					// Construct SOCIAL ONLY pattern
@@ -98,7 +99,11 @@ public class Generator
 					
 					int pItems = network.getThreadPersonMap().get(threadId).get(p);
 					int currentPItems = network.getThreadPersonMap().get(threadId).get(currentPerson);
-					newSTPattern.addSocialWeight(pItems + currentPItems);
+					
+					if(p.equals(currentPerson))
+						newSTPattern.addSocialWeight(pItems);
+					else
+						newSTPattern.addSocialWeight(pItems + currentPItems);
 					
 					// Construct the key 
 					UnorderedPair<String, String> pair = new UnorderedPair<String, String>(newSTPattern.getPerson1Id(), newSTPattern.getPerson2Id());
