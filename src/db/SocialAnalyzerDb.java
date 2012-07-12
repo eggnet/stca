@@ -275,11 +275,13 @@ public class SocialAnalyzerDb extends SocialDb
 	{
 		try
 		{
-			String sql = "SELECT * from patterns where p_id1=? and p_id2=?";
+			String sql = "SELECT * from patterns where p_id1=? and p_id2=? and type=?";
 			ISetter[] parms = {
 					new StringSetter(1, pattern.getPerson1Id()), 
-					new StringSetter(2, pattern.getPerson2Id())
+					new StringSetter(2, pattern.getPerson2Id()),
+					new StringSetter(3, pattern.getPatternType().toString())
 			};
+			
 			PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, parms);
 			this.addExecutionItem(ei);
 			ei.waitUntilExecuted();
@@ -291,10 +293,12 @@ public class SocialAnalyzerDb extends SocialDb
 			}
 			else 
 			{
-				sql = "SELECT * from patterns where p_id1=? and p_id2=?";
+				// Check the reverse order of the p_id1 and p_id2
+				sql = "SELECT * from patterns where p_id1=? and p_id2=? and type=?";
 				ISetter[] parms1 = {
 						new StringSetter(1, pattern.getPerson2Id()), 
-						new StringSetter(2, pattern.getPerson1Id())
+						new StringSetter(2, pattern.getPerson1Id()),
+						new StringSetter(3, pattern.getPatternType().toString())
 				};
 				ei = new PreparedStatementExecutionItem(sql, parms1);
 				this.addExecutionItem(ei);
@@ -349,15 +353,17 @@ public class SocialAnalyzerDb extends SocialDb
 			countPassed++;
 		else
 			countFailed++;
-		String sql = "UPDATE patterns SET passed=?, failed=? where p_id1=? and p_id2=?";
+		String sql = "UPDATE patterns SET passed=?, failed=? where p_id1=? and p_id2=? and type=?";
 		ISetter[] innerParms = {
 				new IntSetter(1, countPassed), 
 				new IntSetter(2, countFailed),
 				new StringSetter(3, pattern.getPerson1Id()), 
 				new StringSetter(4, pattern.getPerson2Id()), 
+				new StringSetter(5, pattern.getPatternType().toString())
 		};
 		PreparedStatementExecutionItem ei = new PreparedStatementExecutionItem(sql, innerParms);
 		this.addExecutionItem(ei);
+		ei.waitUntilExecuted();
 		return true;
 	}
 	
