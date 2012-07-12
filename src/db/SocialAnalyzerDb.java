@@ -3,6 +3,7 @@ package db;
 import java.io.InputStreamReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +15,7 @@ import models.Person;
 import models.STPattern;
 import models.UnorderedPair;
 import models.WeightCriteria;
+import db.Resources.CommType;
 import db.util.ISetter;
 import db.util.ISetter.FloatSetter;
 import db.util.ISetter.IntSetter;
@@ -164,50 +166,63 @@ public class SocialAnalyzerDb extends SocialDb
 		try 
 		{
 			ResultSet rs = ei.getResult();
-			Set<Item> itemSet = null;
-			Map<Person, Integer> personSet = null;
 			
-			int currentThreadId = -1;
+			// Insert each item into correct ThreadMap and correct PersonMap
 			while(rs.next())
 			{
-				int nextThreadId = rs.getInt("thread_id");
-				if (currentThreadId != nextThreadId && nextThreadId != 0)
+				int threadId 	= rs.getInt("thread_id");
+				int pId 		= rs.getInt("p_id");
+				int itemId 		= rs.getInt("item_id");
+				Timestamp time 	= rs.getTimestamp("item_date");
+				String body 	= rs.getString("body");
+				String title 	= rs.getString("title");
+				CommType type	= Resources.CommType.valueOf(rs.getString("type"));
+			
+				String name  = rs.getString("name");
+				String email = rs.getString("email");
+				
+				// Issue has 0 as threadId, use item_id instead
+				if(threadId == 0)
+					threadId = itemId;
+
+				Item newItem     = new Item(pId, time, itemId, body, title, type);
+				Person newPerson = new Person(pId, name, email);
+				
+				// Add to thread map
+				if(threadItemMap.containsKey(threadId))
 				{
-					if (itemSet != null && itemSet.size() > 0)
-						threadItemMap.put(currentThreadId, itemSet);
-					if (personSet != null && personSet.size() > 0)
-						threadPersonMap.put(currentThreadId, personSet);
-					
-					personSet = new HashMap<Person, Integer>();
-					itemSet = new HashSet<Item>();
-					currentThreadId = nextThreadId;
-				}
-				
-				// Add current Item
-				itemSet.add(new Item(
-					rs.getInt("p_id"),
-					rs.getTimestamp("item_date"),
-					rs.getInt("item_id"),
-					rs.getString("body"),
-					rs.getString("title"),
-					Resources.CommType.valueOf(rs.getString("type"))
-				));
-				
-				// Add current person
-				Person newPerson = new Person(
-					rs.getInt("p_id"),
-					rs.getString("name"),
-					rs.getString("email")
-				);
-				
-				if (!(personSet.containsKey(newPerson)))
-				{
-					personSet.put(newPerson, 1);
+					threadItemMap.get(threadId).add(newItem);
 				}
 				else
 				{
-					int numberItems = personSet.get(newPerson);
-					personSet.put(newPerson, numberItems + 1);
+					Set<Item> itemSet = new HashSet<Item>();
+					itemSet.add(newItem);
+					threadItemMap.put(threadId, itemSet);
+				}
+				
+				// Add the person map
+				if(threadPersonMap.containsKey(threadId))
+				{
+					Map<Person, Integer> personMap = threadPersonMap.get(threadId);
+					if(personMap.containsKey(newPerson))
+					{
+						int numberItems = personMap.get(newPerson);
+						personMap.put(newPerson, numberItems + 1);
+					}
+					else
+					{
+						personMap.put(newPerson, 1);
+					}
+					
+					// add back the personMap
+					threadPersonMap.put(threadId, personMap);
+				}
+				else 
+				{
+					// add new Thread id
+					Map<Person, Integer> personMap = new HashMap<Person, Integer>();
+					personMap.put(newPerson, 1);
+					threadPersonMap.put(threadId, personMap);
 				}
 			}
 			
